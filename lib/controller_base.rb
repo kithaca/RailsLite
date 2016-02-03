@@ -8,9 +8,10 @@ class ControllerBase
   attr_reader :req, :res, :params
 
   # Setup the controller
-  def initialize(req, res)
+  def initialize(req, res, params={})
     @req = req
     @res = res
+    @params = params
   end
 
   # Helper method to alias @already_built_response
@@ -24,7 +25,7 @@ class ControllerBase
     @res.status = 302
     @res.header['Location'] = url
     @already_built_response = true
-    @session.store_session(@res)
+    session.store_session(@res)
   end
 
   # Populate the response with content.
@@ -35,7 +36,7 @@ class ControllerBase
     @res.header['Content-Type'] = content_type
     @already_built_response = true
     @res.write(content)
-    @session.store_session(@res)
+    session.store_session(@res)
   end
 
   # use ERB and binding to evaluate templates
@@ -54,5 +55,6 @@ class ControllerBase
 
   # use this with the router to call action_name (:index, :show, :create...)
   def invoke_action(name)
+    self.send(name)
   end
 end
